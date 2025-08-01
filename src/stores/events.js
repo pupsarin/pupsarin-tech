@@ -1,6 +1,5 @@
 import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
-import { format, addDays, subDays } from 'date-fns'
+import { ref } from 'vue'
 
 export const useEventsStore = defineStore('events', () => {
   const events = ref([
@@ -8,7 +7,8 @@ export const useEventsStore = defineStore('events', () => {
     {
       id: 1,
       title: 'Holiday Market',
-      description: 'Festive holiday market with local artisans and seasonal treats.',
+      description:
+        'Festive holiday market with local artisans and seasonal treats.',
       date: '2023-12-15',
       time: '10:00',
       location: {
@@ -40,7 +40,8 @@ export const useEventsStore = defineStore('events', () => {
     {
       id: 3,
       title: 'Tech Year in Review',
-      description: 'Reflect on the biggest tech trends and innovations of 2023.',
+      description:
+        'Reflect on the biggest tech trends and innovations of 2023.',
       date: '2023-12-28',
       time: '18:00',
       location: {
@@ -57,14 +58,14 @@ export const useEventsStore = defineStore('events', () => {
     // Current Week Events (January 2024)
     {
       id: 4,
-      title: 'New Year\'s Day Run',
+      title: "New Year's Day Run",
       description: 'Start the year with a refreshing 5K run through the city.',
       date: '2024-01-01',
       time: '09:00',
       location: {
         name: 'Prospect Park',
         lat: 40.6602,
-        lng: -73.9690
+        lng: -73.969
       },
       attendees: 156,
       maxAttendees: 200,
@@ -108,7 +109,8 @@ export const useEventsStore = defineStore('events', () => {
     {
       id: 7,
       title: 'Cooking Workshop',
-      description: 'Learn to cook authentic Italian cuisine with a master chef.',
+      description:
+        'Learn to cook authentic Italian cuisine with a master chef.',
       date: '2024-01-10',
       time: '14:00',
       location: {
@@ -142,7 +144,8 @@ export const useEventsStore = defineStore('events', () => {
     {
       id: 9,
       title: 'Tech Meetup 2024',
-      description: 'Join us for an exciting evening of networking and tech talks!',
+      description:
+        'Join us for an exciting evening of networking and tech talks!',
       date: '2024-01-15',
       time: '18:00',
       location: {
@@ -158,7 +161,8 @@ export const useEventsStore = defineStore('events', () => {
     {
       id: 10,
       title: 'Yoga in the Park',
-      description: 'Join us for a relaxing yoga session in the heart of the city.',
+      description:
+        'Join us for a relaxing yoga session in the heart of the city.',
       date: '2024-01-17',
       time: '08:00',
       location: {
@@ -192,7 +196,8 @@ export const useEventsStore = defineStore('events', () => {
     {
       id: 12,
       title: 'Food Festival',
-      description: 'Taste cuisines from around the world in this amazing food festival.',
+      description:
+        'Taste cuisines from around the world in this amazing food festival.',
       date: '2024-01-25',
       time: '12:00',
       location: {
@@ -208,7 +213,8 @@ export const useEventsStore = defineStore('events', () => {
     {
       id: 13,
       title: 'Classical Music Concert',
-      description: 'An evening of classical music featuring the city orchestra.',
+      description:
+        'An evening of classical music featuring the city orchestra.',
       date: '2024-01-27',
       time: '19:30',
       location: {
@@ -260,7 +266,8 @@ export const useEventsStore = defineStore('events', () => {
     {
       id: 16,
       title: 'Book Reading & Discussion',
-      description: 'Join us for an evening of literature and thoughtful discussion.',
+      description:
+        'Join us for an evening of literature and thoughtful discussion.',
       date: '2024-02-10',
       time: '19:30',
       location: {
@@ -294,7 +301,8 @@ export const useEventsStore = defineStore('events', () => {
     {
       id: 18,
       title: 'Comedy Night',
-      description: 'Laugh the night away with some of the city\'s best comedians.',
+      description:
+        "Laugh the night away with some of the city's best comedians.",
       date: '2024-02-15',
       time: '21:00',
       location: {
@@ -309,14 +317,14 @@ export const useEventsStore = defineStore('events', () => {
     },
     {
       id: 19,
-      title: 'Valentine\'s Day Dance',
+      title: "Valentine's Day Dance",
       description: 'Romantic evening of dancing and live music.',
       date: '2024-02-14',
       time: '20:00',
       location: {
         name: 'The Plaza Hotel',
         lat: 40.7645,
-        lng: -73.9740
+        lng: -73.974
       },
       attendees: 89,
       maxAttendees: 120,
@@ -384,7 +392,7 @@ export const useEventsStore = defineStore('events', () => {
       location: {
         name: 'Chelsea Market',
         lat: 40.7421,
-        lng: -74.0060
+        lng: -74.006
       },
       attendees: 45,
       maxAttendees: 60,
@@ -396,13 +404,13 @@ export const useEventsStore = defineStore('events', () => {
     {
       id: 24,
       title: 'Spring Art Walk',
-      description: 'Guided tour of the city\'s best art galleries.',
+      description: "Guided tour of the city's best art galleries.",
       date: '2024-03-05',
       time: '14:00',
       location: {
         name: 'Chelsea Galleries',
         lat: 40.7421,
-        lng: -74.0060
+        lng: -74.006
       },
       attendees: 34,
       maxAttendees: 50,
@@ -412,7 +420,8 @@ export const useEventsStore = defineStore('events', () => {
     {
       id: 25,
       title: 'Tech Career Fair',
-      description: 'Connect with top tech companies and find your next opportunity.',
+      description:
+        'Connect with top tech companies and find your next opportunity.',
       date: '2024-03-08',
       time: '10:00',
       location: {
@@ -432,7 +441,7 @@ export const useEventsStore = defineStore('events', () => {
     3: 'interested'
   })
 
-  const addEvent = (eventData) => {
+  const addEvent = eventData => {
     const newEvent = {
       id: Date.now(),
       ...eventData,
@@ -450,7 +459,7 @@ export const useEventsStore = defineStore('events', () => {
     }
   }
 
-  const deleteEvent = (id) => {
+  const deleteEvent = id => {
     const index = events.value.findIndex(event => event.id === id)
     if (index !== -1) {
       events.value.splice(index, 1)
@@ -461,7 +470,7 @@ export const useEventsStore = defineStore('events', () => {
     userRSVPs.value[eventId] = status
   }
 
-  const getEventById = (id) => {
+  const getEventById = id => {
     return events.value.find(event => event.id === id)
   }
 
@@ -482,11 +491,11 @@ export const useEventsStore = defineStore('events', () => {
     return events.value.filter(event => new Date(event.date) < today)
   }
 
-  const getEventsByCategory = (category) => {
+  const getEventsByCategory = category => {
     return events.value.filter(event => event.category === category)
   }
 
-  const getUserRSVP = (eventId) => {
+  const getUserRSVP = eventId => {
     return userRSVPs.value[eventId] || null
   }
 
@@ -494,7 +503,10 @@ export const useEventsStore = defineStore('events', () => {
     const total = events.value.length
     const upcoming = getUpcomingEvents().length
     const past = getPastEvents().length
-    const totalAttendees = events.value.reduce((sum, event) => sum + event.attendees, 0)
+    const totalAttendees = events.value.reduce(
+      (sum, event) => sum + event.attendees,
+      0
+    )
 
     return {
       total,
@@ -519,4 +531,4 @@ export const useEventsStore = defineStore('events', () => {
     getUserRSVP,
     getEventStats
   }
-}) 
+})

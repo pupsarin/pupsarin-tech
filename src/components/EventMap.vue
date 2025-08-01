@@ -1,26 +1,26 @@
 <template>
   <div class="event-map-container">
     <div id="map" ref="mapContainer" class="map-container"></div>
-    
+
     <!-- Map Controls -->
     <div v-if="showControls" class="map-controls">
       <div class="layer-control">
         <h4>Map Style</h4>
         <div class="layer-buttons">
-          <button 
-            @click="setBaseLayer('streets')" 
+          <button
+            @click="setBaseLayer('streets')"
             :class="['layer-btn', { active: currentBaseLayer === 'streets' }]"
           >
             Streets
           </button>
-          <button 
-            @click="setBaseLayer('satellite')" 
+          <button
+            @click="setBaseLayer('satellite')"
             :class="['layer-btn', { active: currentBaseLayer === 'satellite' }]"
           >
             Satellite
           </button>
-          <button 
-            @click="setBaseLayer('terrain')" 
+          <button
+            @click="setBaseLayer('terrain')"
             :class="['layer-btn', { active: currentBaseLayer === 'terrain' }]"
           >
             Terrain
@@ -35,6 +35,7 @@
 import { ref, onMounted, onUnmounted, watch, computed } from 'vue'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
+import { format } from 'date-fns'
 
 export default {
   name: 'EventMap',
@@ -45,7 +46,7 @@ export default {
     },
     center: {
       type: Object,
-      default: () => ({ lat: 40.7128, lng: -74.0060 })
+      default: () => ({ lat: 40.7128, lng: -74.006 })
     },
     zoom: {
       type: Number,
@@ -65,27 +66,30 @@ export default {
     const mapContainer = ref(null)
     const map = ref(null)
     const currentBaseLayer = ref('streets')
-    
+
     // Layer groups
     const eventLayer = ref(null)
-    
+
     // Base layers
     const baseLayers = ref({})
     const currentLayer = ref(null)
-    
+
     // Week-based event count
     const weekEventsCount = computed(() => {
       if (!props.currentWeek) return 0
       return props.events.filter(event => {
         const eventDate = new Date(event.date)
-        return eventDate >= props.currentWeek.start && eventDate <= props.currentWeek.end
+        return (
+          eventDate >= props.currentWeek.start &&
+          eventDate <= props.currentWeek.end
+        )
       }).length
     })
-    
+
     // Initialize map
     const initMap = () => {
       if (!mapContainer.value) return
-      
+
       // Create map instance
       map.value = L.map(mapContainer.value, {
         center: [props.center.lat, props.center.lng],
@@ -93,79 +97,100 @@ export default {
         zoomControl: true,
         attributionControl: true
       })
-      
+
       // Initialize base layers
       initBaseLayers()
-      
+
       // Initialize event layer
       initEventLayer()
-      
+
       // Set initial base layer
       setBaseLayer('streets')
     }
-    
+
     // Initialize base map layers
     const initBaseLayers = () => {
       baseLayers.value = {
-        'Streets': L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          attribution: '© OpenStreetMap contributors'
-        }),
-        'Satellite': L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-          attribution: '© Esri'
-        }),
-        'Terrain': L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
-          attribution: '© OpenTopoMap'
-        })
+        Streets: L.tileLayer(
+          'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+          {
+            attribution: '© OpenStreetMap contributors'
+          }
+        ),
+        Satellite: L.tileLayer(
+          'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+          {
+            attribution: '© Esri'
+          }
+        ),
+        Terrain: L.tileLayer(
+          'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
+          {
+            attribution: '© OpenTopoMap'
+          }
+        )
       }
     }
-    
+
     // Initialize event layer
     const initEventLayer = () => {
       eventLayer.value = L.layerGroup()
       map.value.addLayer(eventLayer.value)
     }
-    
+
     // Set base layer
-    const setBaseLayer = (layerType) => {
+    const setBaseLayer = layerType => {
       if (currentLayer.value) {
         map.value.removeLayer(currentLayer.value)
       }
-      
+
       currentBaseLayer.value = layerType
-      currentLayer.value = baseLayers.value[layerType === 'streets' ? 'Streets' : 
-                                          layerType === 'satellite' ? 'Satellite' : 'Terrain']
+      currentLayer.value =
+        baseLayers.value[
+          layerType === 'streets'
+            ? 'Streets'
+            : layerType === 'satellite'
+              ? 'Satellite'
+              : 'Terrain'
+        ]
       currentLayer.value.addTo(map.value)
     }
-    
 
-    
     // Create event marker
-    const createEventMarker = (event) => {
+    const createEventMarker = event => {
       const isUpcoming = new Date(event.date) > new Date()
-      const isToday = new Date(event.date).toDateString() === new Date().toDateString()
-      
+      const isToday =
+        new Date(event.date).toDateString() === new Date().toDateString()
+
       // Choose icon based on event type and status
-      let iconUrl = 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png'
-      
+      let iconUrl =
+        'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png'
+
       if (isToday) {
-        iconUrl = 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png'
+        iconUrl =
+          'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png'
       } else if (isUpcoming) {
-        iconUrl = 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png'
+        iconUrl =
+          'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png'
       } else {
-        iconUrl = 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-grey.png'
+        iconUrl =
+          'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-grey.png'
       }
-      
+
       const icon = L.icon({
         iconUrl: iconUrl,
-        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+        shadowUrl:
+          'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
         iconSize: [25, 41],
         iconAnchor: [12, 41],
         popupAnchor: [1, -34],
         shadowSize: [41, 41]
       })
-      
-      const marker = L.marker([event.location.lat, event.location.lng], { icon })
-      
+
+      const marker = L.marker([event.location.lat, event.location.lng], {
+        icon
+      })
+
       // Create popup content
       const popupContent = `
         <div class="event-popup">
@@ -179,33 +204,33 @@ export default {
           </button>
         </div>
       `
-      
+
       marker.bindPopup(popupContent)
-      
+
       // Add click handler
       marker.on('click', () => {
         emit('event-click', event)
       })
-      
+
       return marker
     }
-    
+
     // Update event markers
     const updateEventMarkers = () => {
       // Clear existing markers
       eventLayer.value.clearLayers()
-      
+
       props.events.forEach(event => {
         const marker = createEventMarker(event)
         eventLayer.value.addLayer(marker)
       })
     }
-    
+
     // Watch for events changes
     watch(() => props.events, updateEventMarkers, { deep: true })
-    
+
     // Handle event click from popup
-    const handleEventClick = (event) => {
+    const handleEventClick = event => {
       const eventId = event.detail
       const clickedEvent = props.events.find(e => e.id === eventId)
       if (clickedEvent) {
@@ -214,26 +239,26 @@ export default {
     }
 
     // Format week range for display
-    const formatWeekRange = (week) => {
+    const formatWeekRange = week => {
       if (!week) return ''
       return `${format(week.start, 'MMM dd')} - ${format(week.end, 'MMM dd')}`
     }
-    
+
     onMounted(() => {
       initMap()
       updateEventMarkers()
-      
+
       // Add global event listener for popup buttons
       window.addEventListener('event-click', handleEventClick)
     })
-    
+
     onUnmounted(() => {
       if (map.value) {
         map.value.remove()
       }
       window.removeEventListener('event-click', handleEventClick)
     })
-    
+
     return {
       mapContainer,
       currentBaseLayer,
@@ -328,7 +353,7 @@ export default {
   font-size: 0.875rem;
 }
 
-.layer-toggle input[type="checkbox"] {
+.layer-toggle input[type='checkbox'] {
   width: 16px;
   height: 16px;
 }
@@ -409,9 +434,9 @@ export default {
     margin-bottom: 1rem;
     max-width: none;
   }
-  
+
   .layer-buttons {
     flex-direction: column;
   }
 }
-</style> 
+</style>

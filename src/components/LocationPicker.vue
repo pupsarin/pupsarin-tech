@@ -4,37 +4,42 @@
       <h3>Select Event Location</h3>
       <p>Click on the map to set the event location</p>
     </div>
-    
+
     <div class="map-container">
       <div id="location-map" ref="mapContainer" class="location-map"></div>
-      
+
       <!-- Location Info -->
       <div v-if="selectedLocation" class="location-info">
         <div class="location-details">
           <h4>Selected Location</h4>
-          <p><strong>Latitude:</strong> {{ selectedLocation.lat.toFixed(6) }}</p>
-          <p><strong>Longitude:</strong> {{ selectedLocation.lng.toFixed(6) }}</p>
-          <p><strong>Address:</strong> {{ selectedLocation.address || 'Click on map to select location' }}</p>
+          <p>
+            <strong>Latitude:</strong> {{ selectedLocation.lat.toFixed(6) }}
+          </p>
+          <p>
+            <strong>Longitude:</strong> {{ selectedLocation.lng.toFixed(6) }}
+          </p>
+          <p>
+            <strong>Address:</strong>
+            {{ selectedLocation.address || 'Click on map to select location' }}
+          </p>
         </div>
         <button @click="clearLocation" class="btn btn-outline btn-sm">
           Clear Location
         </button>
       </div>
     </div>
-    
+
     <!-- Search Box -->
     <div class="search-container">
       <div class="search-box">
-        <input 
-          v-model="searchQuery" 
-          type="text" 
+        <input
+          v-model="searchQuery"
+          type="text"
           placeholder="Search for a location..."
           class="search-input"
           @keyup.enter="searchLocation"
         />
-        <button @click="searchLocation" class="search-btn">
-          🔍
-        </button>
+        <button @click="searchLocation" class="search-btn">🔍</button>
       </div>
     </div>
   </div>
@@ -50,7 +55,7 @@ export default {
   props: {
     initialLocation: {
       type: Object,
-      default: () => ({ lat: 40.7128, lng: -74.0060 })
+      default: () => ({ lat: 40.7128, lng: -74.006 })
     },
     initialZoom: {
       type: Number,
@@ -64,34 +69,34 @@ export default {
     const marker = ref(null)
     const searchQuery = ref('')
     const selectedLocation = ref(null)
-    
+
     // Initialize map
     const initMap = () => {
       if (!mapContainer.value) return
-      
+
       // Create map instance
       map.value = L.map(mapContainer.value, {
         center: [props.initialLocation.lat, props.initialLocation.lng],
         zoom: props.initialZoom,
         zoomControl: true
       })
-      
+
       // Add OpenStreetMap tiles
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© OpenStreetMap contributors'
       }).addTo(map.value)
-      
+
       // Add click handler
       map.value.on('click', handleMapClick)
-      
+
       // Add search control
       addSearchControl()
     }
-    
+
     // Handle map click
-    const handleMapClick = (e) => {
+    const handleMapClick = e => {
       const { lat, lng } = e.latlng
-      
+
       // Update or create marker
       if (marker.value) {
         marker.value.setLatLng([lat, lng])
@@ -99,39 +104,39 @@ export default {
         marker.value = L.marker([lat, lng], {
           draggable: true
         }).addTo(map.value)
-        
+
         // Add drag end handler
         marker.value.on('dragend', handleMarkerDragEnd)
       }
-      
+
       // Update selected location
       selectedLocation.value = {
         lat,
         lng,
         address: `Location at ${lat.toFixed(6)}, ${lng.toFixed(6)}`
       }
-      
+
       // Emit location selected event
       emit('location-selected', selectedLocation.value)
-      
+
       // Reverse geocode to get address
       reverseGeocode(lat, lng)
     }
-    
+
     // Handle marker drag end
-    const handleMarkerDragEnd = (e) => {
+    const handleMarkerDragEnd = e => {
       const { lat, lng } = e.target.getLatLng()
-      
+
       selectedLocation.value = {
         lat,
         lng,
         address: `Location at ${lat.toFixed(6)}, ${lng.toFixed(6)}`
       }
-      
+
       emit('location-selected', selectedLocation.value)
       reverseGeocode(lat, lng)
     }
-    
+
     // Reverse geocoding using Nominatim
     const reverseGeocode = async (lat, lng) => {
       try {
@@ -139,7 +144,7 @@ export default {
           `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`
         )
         const data = await response.json()
-        
+
         if (data.display_name) {
           selectedLocation.value.address = data.display_name
           emit('location-selected', selectedLocation.value)
@@ -148,25 +153,25 @@ export default {
         console.log('Reverse geocoding failed:', error)
       }
     }
-    
+
     // Search for location
     const searchLocation = async () => {
       if (!searchQuery.value.trim()) return
-      
+
       try {
         const response = await fetch(
           `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery.value)}&limit=1`
         )
         const data = await response.json()
-        
+
         if (data.length > 0) {
           const location = data[0]
           const lat = parseFloat(location.lat)
           const lng = parseFloat(location.lon)
-          
+
           // Update map view
           map.value.setView([lat, lng], 16)
-          
+
           // Update marker
           if (marker.value) {
             marker.value.setLatLng([lat, lng])
@@ -176,89 +181,101 @@ export default {
             }).addTo(map.value)
             marker.value.on('dragend', handleMarkerDragEnd)
           }
-          
+
           // Update selected location
           selectedLocation.value = {
             lat,
             lng,
             address: location.display_name
           }
-          
+
           emit('location-selected', selectedLocation.value)
         }
       } catch (error) {
         console.log('Location search failed:', error)
       }
     }
-    
+
     // Add search control to map
     const addSearchControl = () => {
       // Create a custom search control
       const searchControl = L.Control.extend({
-        onAdd: function() {
-          const container = L.DomUtil.create('div', 'leaflet-bar leaflet-control')
+        onAdd: function () {
+          const container = L.DomUtil.create(
+            'div',
+            'leaflet-bar leaflet-control'
+          )
           container.innerHTML = `
             <input type="text" placeholder="Search..." style="width: 200px; padding: 5px; border: 1px solid #ccc; border-radius: 3px;">
           `
-          
+
           const input = container.querySelector('input')
-          input.addEventListener('keyup', (e) => {
+          input.addEventListener('keyup', e => {
             if (e.key === 'Enter') {
               searchQuery.value = input.value
               searchLocation()
             }
           })
-          
+
           return container
         }
       })
-      
+
       new searchControl({ position: 'topleft' }).addTo(map.value)
     }
-    
+
     // Clear selected location
     const clearLocation = () => {
       if (marker.value) {
         map.value.removeLayer(marker.value)
         marker.value = null
       }
-      
+
       selectedLocation.value = null
       emit('location-cleared')
     }
-    
+
     // Watch for initial location changes
-    watch(() => props.initialLocation, (newLocation) => {
-      if (map.value && newLocation) {
-        map.value.setView([newLocation.lat, newLocation.lng], props.initialZoom)
-        
-        if (marker.value) {
-          marker.value.setLatLng([newLocation.lat, newLocation.lng])
-        } else {
-          marker.value = L.marker([newLocation.lat, newLocation.lng], {
-            draggable: true
-          }).addTo(map.value)
-          marker.value.on('dragend', handleMarkerDragEnd)
+    watch(
+      () => props.initialLocation,
+      newLocation => {
+        if (map.value && newLocation) {
+          map.value.setView(
+            [newLocation.lat, newLocation.lng],
+            props.initialZoom
+          )
+
+          if (marker.value) {
+            marker.value.setLatLng([newLocation.lat, newLocation.lng])
+          } else {
+            marker.value = L.marker([newLocation.lat, newLocation.lng], {
+              draggable: true
+            }).addTo(map.value)
+            marker.value.on('dragend', handleMarkerDragEnd)
+          }
+
+          selectedLocation.value = {
+            lat: newLocation.lat,
+            lng: newLocation.lng,
+            address:
+              newLocation.address ||
+              `Location at ${newLocation.lat.toFixed(6)}, ${newLocation.lng.toFixed(6)}`
+          }
         }
-        
-        selectedLocation.value = {
-          lat: newLocation.lat,
-          lng: newLocation.lng,
-          address: newLocation.address || `Location at ${newLocation.lat.toFixed(6)}, ${newLocation.lng.toFixed(6)}`
-        }
-      }
-    }, { immediate: true })
-    
+      },
+      { immediate: true }
+    )
+
     onMounted(() => {
       initMap()
     })
-    
+
     onUnmounted(() => {
       if (map.value) {
         map.value.remove()
       }
     })
-    
+
     return {
       mapContainer,
       searchQuery,
@@ -370,7 +387,7 @@ export default {
   .location-map {
     height: 300px;
   }
-  
+
   .location-info {
     position: relative;
     top: auto;
@@ -379,4 +396,4 @@ export default {
     max-width: none;
   }
 }
-</style> 
+</style>

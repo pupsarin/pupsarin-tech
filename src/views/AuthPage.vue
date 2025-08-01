@@ -4,16 +4,22 @@
       <div class="auth-card">
         <div class="auth-header">
           <h1>{{ isLogin ? 'Welcome Back' : 'Join EventMap' }}</h1>
-          <p>{{ isLogin ? 'Sign in to your account' : 'Create your account to get started' }}</p>
+          <p>
+            {{
+              isLogin
+                ? 'Sign in to your account'
+                : 'Create your account to get started'
+            }}
+          </p>
         </div>
 
         <form @submit.prevent="handleSubmit" class="auth-form">
           <div v-if="!isLogin" class="form-group">
             <label class="form-label">Full Name</label>
-            <input 
-              v-model="form.name" 
-              type="text" 
-              class="form-input" 
+            <input
+              v-model="form.name"
+              type="text"
+              class="form-input"
               placeholder="Enter your full name"
               required
             />
@@ -21,10 +27,10 @@
 
           <div class="form-group">
             <label class="form-label">Email</label>
-            <input 
-              v-model="form.email" 
-              type="email" 
-              class="form-input" 
+            <input
+              v-model="form.email"
+              type="email"
+              class="form-input"
               placeholder="Enter your email"
               required
             />
@@ -32,10 +38,10 @@
 
           <div class="form-group">
             <label class="form-label">Password</label>
-            <input 
-              v-model="form.password" 
-              type="password" 
-              class="form-input" 
+            <input
+              v-model="form.password"
+              type="password"
+              class="form-input"
               placeholder="Enter your password"
               required
             />
@@ -60,7 +66,9 @@
 
         <div class="auth-footer">
           <p>
-            {{ isLogin ? "Don't have an account?" : "Already have an account?" }}
+            {{
+              isLogin ? "Don't have an account?" : 'Already have an account?'
+            }}
             <button @click="toggleMode" class="link-button">
               {{ isLogin ? 'Sign up' : 'Sign in' }}
             </button>
@@ -91,10 +99,10 @@ export default {
   setup() {
     const router = useRouter()
     const authStore = useAuthStore()
-    
+
     const isLogin = ref(true)
     const error = ref('')
-    
+
     const form = reactive({
       name: '',
       email: '',
@@ -104,15 +112,20 @@ export default {
 
     const handleSubmit = async () => {
       error.value = ''
-      
+
       try {
         let result
         if (isLogin.value) {
           result = authStore.login(form.email, form.password)
         } else {
-          result = authStore.signup(form.name, form.email, form.password, form.role)
+          result = authStore.signup(
+            form.name,
+            form.email,
+            form.password,
+            form.role
+          )
         }
-        
+
         if (result.success) {
           router.push('/')
         } else {
@@ -151,7 +164,11 @@ export default {
   align-items: center;
   justify-content: center;
   padding: 2rem;
-  background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--primary-color) 0%,
+    var(--secondary-color) 100%
+  );
 }
 
 .auth-container {
@@ -247,9 +264,9 @@ export default {
   .auth-page {
     padding: 1rem;
   }
-  
+
   .auth-card {
     padding: 1.5rem;
   }
 }
-</style> 
+</style>

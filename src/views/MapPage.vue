@@ -31,17 +31,17 @@
 
     <!-- Map Container with Time Navigator Overlay -->
     <div class="map-container">
-      <EventMap 
-        :events="filteredEvents" 
-        :center="{ lat: 40.7128, lng: -74.0060 }" 
+      <EventMap
+        :events="filteredEvents"
+        :center="{ lat: 40.7128, lng: -74.006 }"
         :zoom="12"
         :current-week="currentWeek"
         @event-click="handleEventClick"
       />
-      
+
       <!-- Compact Time Navigator Overlay -->
       <div class="time-navigator-overlay">
-        <TimeNavigator 
+        <TimeNavigator
           :events="eventsStore.events"
           :initial-week-index="currentWeekIndex"
           :compact="true"
@@ -55,9 +55,9 @@
     <div class="events-section">
       <h2>Events ({{ filteredEvents.length }})</h2>
       <div class="events-grid">
-        <div 
-          v-for="event in filteredEvents" 
-          :key="event.id" 
+        <div
+          v-for="event in filteredEvents"
+          :key="event.id"
           class="event-card"
           @click="selectEvent(event)"
         >
@@ -72,7 +72,9 @@
           </div>
           <p class="event-description">{{ event.description }}</p>
           <div class="event-footer">
-            <span class="attendees">👥 {{ event.attendees }}/{{ event.maxAttendees }} attending</span>
+            <span class="attendees"
+              >👥 {{ event.attendees }}/{{ event.maxAttendees }} attending</span
+            >
             <router-link :to="`/event/${event.id}`" class="btn btn-primary">
               View Details
             </router-link>
@@ -84,10 +86,14 @@
 </template>
 
 <script>
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useEventsStore } from '../stores/events'
-import { format, subDays, addDays, startOfDay, endOfDay, startOfWeek, endOfWeek, isWithinInterval, parseISO } from 'date-fns'
+import {
+  format,
+  isWithinInterval,
+  parseISO
+} from 'date-fns'
 import EventMap from '../components/EventMap.vue'
 import TimeNavigator from '../components/TimeNavigator.vue'
 
@@ -100,12 +106,10 @@ export default {
   setup() {
     const router = useRouter()
     const eventsStore = useEventsStore()
-    
+
     const selectedCategory = ref('')
     const currentWeekIndex = ref(0)
     const currentWeek = ref(null)
-    const map = ref(null)
-    const markers = ref([])
 
     const filteredEvents = computed(() => {
       let events = eventsStore.events
@@ -123,22 +127,24 @@ export default {
 
       // Filter by category
       if (selectedCategory.value) {
-        events = events.filter(event => event.category === selectedCategory.value)
+        events = events.filter(
+          event => event.category === selectedCategory.value
+        )
       }
 
       return events
     })
 
-    const formatDate = (dateString) => {
+    const formatDate = dateString => {
       return format(new Date(dateString), 'MMM dd, yyyy')
     }
 
-    const handleWeekChange = (weekData) => {
+    const handleWeekChange = weekData => {
       currentWeekIndex.value = weekData.weekIndex
       currentWeek.value = weekData.week
     }
 
-    const handleEventClick = (event) => {
+    const handleEventClick = event => {
       router.push(`/event/${event.id}`)
     }
 
@@ -148,14 +154,7 @@ export default {
       currentWeekIndex.value = 0
     }
 
-    const selectEvent = (event) => {
-      // Center map on selected event
-      if (map.value) {
-        map.value.setView([event.location.lat, event.location.lng], 15)
-      }
-    }
 
-    // Remove old map initialization code since we're using the EventMap component
 
     return {
       eventsStore,
@@ -165,7 +164,6 @@ export default {
       filteredEvents,
       formatDate,
       clearFilters,
-      selectEvent,
       handleEventClick,
       handleWeekChange
     }
@@ -279,25 +277,25 @@ export default {
   .map-page {
     padding: 0.5rem;
   }
-  
+
   .page-header h1 {
     font-size: 1.5rem;
   }
-  
+
   .map-container {
     height: 60vh;
     min-height: 400px;
   }
-  
+
   .time-navigator-overlay {
     top: 10px;
     left: 10px;
     right: 10px;
     padding: 0.75rem;
   }
-  
+
   .events-grid {
     grid-template-columns: 1fr;
   }
 }
-</style> 
+</style>
