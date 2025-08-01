@@ -5,33 +5,35 @@
       <div class="compact-header">
         <div class="current-week-compact">
           <span class="week-date-compact">{{ currentWeekLabel }}</span>
-          <span class="event-count-compact">{{ currentWeekEvents.length }} events</span>
+          <span class="event-count-compact"
+            >{{ currentWeekEvents.length }} events</span
+          >
         </div>
       </div>
-      
+
       <div class="compact-controls">
-        <button 
-          @click="previousWeek" 
+        <button
+          @click="previousWeek"
           class="nav-btn-compact"
           :disabled="currentWeekIndex === 0"
         >
           ←
         </button>
-        
+
         <div class="slider-container-compact">
-          <input 
-            v-model="currentWeekIndex" 
-            type="range" 
-            :min="0" 
-            :max="totalWeeks - 1" 
+          <input
+            v-model="currentWeekIndex"
+            type="range"
+            :min="0"
+            :max="totalWeeks - 1"
             step="1"
             class="week-range-slider-compact"
             @input="handleWeekChange"
           />
         </div>
-        
-        <button 
-          @click="nextWeek" 
+
+        <button
+          @click="nextWeek"
           class="nav-btn-compact"
           :disabled="currentWeekIndex === totalWeeks - 1"
         >
@@ -39,7 +41,7 @@
         </button>
       </div>
     </div>
-    
+
     <!-- Full Version -->
     <div v-else>
       <div class="time-header">
@@ -49,28 +51,28 @@
           <span class="week-date">{{ currentWeekLabel }}</span>
         </div>
       </div>
-      
+
       <div class="time-controls">
         <div class="week-slider">
           <div class="slider-labels">
             <span class="slider-label">{{ firstWeekLabel }}</span>
             <span class="slider-label">{{ lastWeekLabel }}</span>
           </div>
-          
+
           <div class="slider-container">
-            <input 
-              v-model="currentWeekIndex" 
-              type="range" 
-              :min="0" 
-              :max="totalWeeks - 1" 
+            <input
+              v-model="currentWeekIndex"
+              type="range"
+              :min="0"
+              :max="totalWeeks - 1"
               step="1"
               class="week-range-slider"
               @input="handleWeekChange"
             />
-            
+
             <div class="week-markers">
-              <div 
-                v-for="(week, index) in weekMarkers" 
+              <div
+                v-for="(week, index) in weekMarkers"
                 :key="index"
                 class="week-marker"
                 :class="{ active: index === currentWeekIndex }"
@@ -83,18 +85,18 @@
             </div>
           </div>
         </div>
-        
+
         <div class="week-navigation">
-          <button 
-            @click="previousWeek" 
+          <button
+            @click="previousWeek"
             class="nav-btn"
             :disabled="currentWeekIndex === 0"
           >
             ← Previous Week
           </button>
-          
-          <button 
-            @click="nextWeek" 
+
+          <button
+            @click="nextWeek"
             class="nav-btn"
             :disabled="currentWeekIndex === totalWeeks - 1"
           >
@@ -102,7 +104,7 @@
           </button>
         </div>
       </div>
-      
+
       <div class="week-summary">
         <div class="summary-stats">
           <div class="stat-item">
@@ -114,12 +116,12 @@
             <span class="stat-value">{{ currentWeekRange }}</span>
           </div>
         </div>
-        
+
         <div class="week-events-preview">
           <h4>This Week's Events</h4>
           <div class="events-list">
-            <div 
-              v-for="event in currentWeekEvents" 
+            <div
+              v-for="event in currentWeekEvents"
               :key="event.id"
               class="event-preview"
               @click="$emit('event-click', event)"
@@ -140,7 +142,12 @@
 
 <script>
 import { ref, computed, watch } from 'vue'
-import { format, startOfWeek, endOfWeek, addWeeks, subWeeks, isSameWeek, parseISO } from 'date-fns'
+import {
+  format,
+  startOfWeek,
+  endOfWeek,
+  parseISO
+} from 'date-fns'
 
 export default {
   name: 'TimeNavigator',
@@ -161,16 +168,16 @@ export default {
   emits: ['week-change', 'event-click'],
   setup(props, { emit }) {
     const currentWeekIndex = ref(props.initialWeekIndex)
-    
+
     // Calculate all weeks that contain events
     const allWeeks = computed(() => {
       const weekMap = new Map()
-      
+
       props.events.forEach(event => {
         const eventDate = parseISO(event.date)
         const weekStart = startOfWeek(eventDate, { weekStartsOn: 1 }) // Monday start
         const weekKey = format(weekStart, 'yyyy-MM-dd')
-        
+
         if (!weekMap.has(weekKey)) {
           weekMap.set(weekKey, {
             start: weekStart,
@@ -180,13 +187,13 @@ export default {
         }
         weekMap.get(weekKey).events.push(event)
       })
-      
+
       // Sort weeks by date
       return Array.from(weekMap.values()).sort((a, b) => a.start - b.start)
     })
-    
+
     const totalWeeks = computed(() => allWeeks.value.length)
-    
+
     // Create week markers for the slider
     const weekMarkers = computed(() => {
       return allWeeks.value.map((week, index) => ({
@@ -197,37 +204,37 @@ export default {
         end: week.end
       }))
     })
-    
+
     // Current week data
     const currentWeek = computed(() => {
       if (allWeeks.value.length === 0) return null
       return allWeeks.value[currentWeekIndex.value] || allWeeks.value[0]
     })
-    
+
     const currentWeekEvents = computed(() => {
       return currentWeek.value?.events || []
     })
-    
+
     const currentWeekLabel = computed(() => {
       if (!currentWeek.value) return 'No events'
       return `${format(currentWeek.value.start, 'MMM dd')} - ${format(currentWeek.value.end, 'MMM dd, yyyy')}`
     })
-    
+
     const currentWeekRange = computed(() => {
       if (!currentWeek.value) return 'No events'
       return `${format(currentWeek.value.start, 'MMM dd')} - ${format(currentWeek.value.end, 'MMM dd')}`
     })
-    
+
     const firstWeekLabel = computed(() => {
       if (weekMarkers.value.length === 0) return ''
       return weekMarkers.value[0].label
     })
-    
+
     const lastWeekLabel = computed(() => {
       if (weekMarkers.value.length === 0) return ''
       return weekMarkers.value[weekMarkers.value.length - 1].label
     })
-    
+
     // Navigation methods
     const handleWeekChange = () => {
       emit('week-change', {
@@ -236,38 +243,41 @@ export default {
         events: currentWeekEvents.value
       })
     }
-    
-    const setWeek = (index) => {
+
+    const setWeek = index => {
       currentWeekIndex.value = index
       handleWeekChange()
     }
-    
+
     const previousWeek = () => {
       if (currentWeekIndex.value > 0) {
         currentWeekIndex.value--
         handleWeekChange()
       }
     }
-    
+
     const nextWeek = () => {
       if (currentWeekIndex.value < totalWeeks.value - 1) {
         currentWeekIndex.value++
         handleWeekChange()
       }
     }
-    
+
     // Helper methods
-    const formatDay = (dateString) => {
+    const formatDay = dateString => {
       return format(parseISO(dateString), 'EEE')
     }
-    
+
     // Watch for events changes and adjust current week if needed
-    watch(() => props.events, () => {
-      if (currentWeekIndex.value >= totalWeeks.value) {
-        currentWeekIndex.value = Math.max(0, totalWeeks.value - 1)
+    watch(
+      () => props.events,
+      () => {
+        if (currentWeekIndex.value >= totalWeeks.value) {
+          currentWeekIndex.value = Math.max(0, totalWeeks.value - 1)
+        }
       }
-    })
-    
+    )
+
     return {
       currentWeekIndex,
       totalWeeks,
@@ -658,20 +668,20 @@ export default {
     align-items: flex-start;
     gap: 0.5rem;
   }
-  
+
   .summary-stats {
     flex-direction: column;
     gap: 1rem;
   }
-  
+
   .week-navigation {
     flex-direction: column;
   }
-  
+
   .event-preview {
     flex-direction: column;
     align-items: flex-start;
     gap: 0.5rem;
   }
 }
-</style> 
+</style>

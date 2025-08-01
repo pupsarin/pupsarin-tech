@@ -5,6 +5,7 @@ A modern, responsive event management web application built with Vue.js 3, featu
 ## Features
 
 ### 🗺️ Map Page
+
 - **Real Interactive Map**: Powered by Leaflet with OpenStreetMap tiles
 - **Multiple Map Layers**: Streets, Satellite, and Terrain views
 - **Time Navigation**: Week-by-week navigation with range slider (25 events across 10 weeks)
@@ -15,25 +16,29 @@ A modern, responsive event management web application built with Vue.js 3, featu
 - **Advanced Filtering**: Filter events by category and layer type
 
 ### 👤 User Authentication
+
 - **Login/Signup**: Secure authentication system with role-based access
 - **User Role Management**: Differentiate between regular users and admins
-- **Demo Accounts**: 
+- **Demo Accounts**:
   - Admin: `admin@example.com` / `admin123`
   - User: `user@example.com` / `user123`
 
 ### ⚙️ User Settings
+
 - **Notification Preferences**: Email notifications, event reminders, alerts
 - **Privacy Settings**: Profile visibility, attendance display, location sharing
 - **Event Preferences**: Category preferences, distance range settings
 - **Data Export**: Export user data as JSON
 
 ### 📅 Event Details
+
 - **Comprehensive Event Info**: Title, description, date, time, location
 - **Interactive Map**: Event location display
 - **RSVP System**: Attend, interested, or not attending options
 - **Attendee Tracking**: Real-time attendee count and capacity
 
 ### 🎯 Admin Features
+
 - **Event Creation**: Create new events with real map location picker
 - **Location Search**: Search for locations and get real addresses
 - **Interactive Location Picker**: Click and drag to set precise event locations
@@ -54,23 +59,27 @@ A modern, responsive event management web application built with Vue.js 3, featu
 ## Getting Started
 
 ### Prerequisites
+
 - Node.js (version 16 or higher)
 - npm or yarn
 
 ### Installation
 
 1. **Clone the repository**
+
    ```bash
    git clone <repository-url>
    cd eventmap-app
    ```
 
 2. **Install dependencies**
+
    ```bash
    npm install
    ```
 
 3. **Start the development server**
+
    ```bash
    npm run dev
    ```
@@ -110,10 +119,13 @@ src/
 The application uses mock data for demonstration purposes:
 
 ### Events (25 Total)
+
 **Past Events (Dec 2023):**
+
 - Holiday Market, Winter Jazz Festival, Tech Year in Review
 
 **Current & Future Events (Jan-Mar 2024):**
+
 - New Year's Day Run, Art Exhibition Opening, Business Networking Mixer
 - Cooking Workshop, Poetry Slam, Tech Meetup 2024, Yoga in the Park
 - Art Gallery Opening, Food Festival, Classical Music Concert
@@ -126,12 +138,14 @@ The application uses mock data for demonstration purposes:
 **Spread across 10 weeks with events Monday-Sunday**
 
 ### Users
+
 - Admin User (admin@example.com)
 - Regular User (user@example.com)
 
 ## Features in Detail
 
 ### Map Functionality
+
 - **Real Map Integration**: Leaflet.js with OpenStreetMap tiles
 - **Multiple Base Layers**: Streets, Satellite, and Terrain views
 - **Time Navigation System**: Week-by-week navigation with interactive range slider
@@ -143,16 +157,19 @@ The application uses mock data for demonstration purposes:
 - **Responsive Design**: Works seamlessly on mobile and desktop
 
 ### Authentication System
+
 - Role-based access control
 - Protected routes for admin features
 - Session management with Pinia
 
 ### Event Management
+
 - CRUD operations for events
 - Location picker with coordinate input
 - Attendee tracking and RSVP system
 
 ### Admin Dashboard
+
 - Real-time statistics
 - Event and user management tables
 - Recent activity feed
@@ -161,6 +178,7 @@ The application uses mock data for demonstration purposes:
 ## Customization
 
 ### Styling
+
 The application uses CSS variables for easy theming. Modify the variables in `src/style.css`:
 
 ```css
@@ -173,6 +191,7 @@ The application uses CSS variables for easy theming. Modify the variables in `sr
 ```
 
 ### Adding New Features
+
 1. Create new components in `src/views/` or `src/components/`
 2. Add routes in `src/router/index.js`
 3. Update stores as needed in `src/stores/`
@@ -214,4 +233,4 @@ Use these accounts to explore different user roles and permissions.
 - Social features (sharing, comments)
 - Advanced search and filtering
 - Mobile app development
-- Payment integration for paid events 
+- Payment integration for paid events

@@ -35,10 +35,7 @@
               <p>Receive email updates about new events and updates</p>
             </div>
             <label class="toggle-switch">
-              <input 
-                v-model="settings.emailNotifications" 
-                type="checkbox"
-              />
+              <input v-model="settings.emailNotifications" type="checkbox" />
               <span class="toggle-slider"></span>
             </label>
           </div>
@@ -49,10 +46,7 @@
               <p>Get reminded about events you're attending</p>
             </div>
             <label class="toggle-switch">
-              <input 
-                v-model="settings.eventReminders" 
-                type="checkbox"
-              />
+              <input v-model="settings.eventReminders" type="checkbox" />
               <span class="toggle-slider"></span>
             </label>
           </div>
@@ -63,10 +57,7 @@
               <p>Notifications when new events are added near you</p>
             </div>
             <label class="toggle-switch">
-              <input 
-                v-model="settings.newEventAlerts" 
-                type="checkbox"
-              />
+              <input v-model="settings.newEventAlerts" type="checkbox" />
               <span class="toggle-slider"></span>
             </label>
           </div>
@@ -77,10 +68,7 @@
               <p>Receive a weekly summary of upcoming events</p>
             </div>
             <label class="toggle-switch">
-              <input 
-                v-model="settings.weeklyDigest" 
-                type="checkbox"
-              />
+              <input v-model="settings.weeklyDigest" type="checkbox" />
               <span class="toggle-slider"></span>
             </label>
           </div>
@@ -97,10 +85,7 @@
               <p>Allow other users to see your profile and RSVP status</p>
             </div>
             <label class="toggle-switch">
-              <input 
-                v-model="settings.profileVisible" 
-                type="checkbox"
-              />
+              <input v-model="settings.profileVisible" type="checkbox" />
               <span class="toggle-slider"></span>
             </label>
           </div>
@@ -111,10 +96,7 @@
               <p>Display your attendance status on event pages</p>
             </div>
             <label class="toggle-switch">
-              <input 
-                v-model="settings.showAttendance" 
-                type="checkbox"
-              />
+              <input v-model="settings.showAttendance" type="checkbox" />
               <span class="toggle-slider"></span>
             </label>
           </div>
@@ -125,10 +107,7 @@
               <p>Allow the app to use your location for nearby events</p>
             </div>
             <label class="toggle-switch">
-              <input 
-                v-model="settings.locationSharing" 
-                type="checkbox"
-              />
+              <input v-model="settings.locationSharing" type="checkbox" />
               <span class="toggle-slider"></span>
             </label>
           </div>
@@ -145,14 +124,14 @@
               <p>Categories you're most interested in</p>
             </div>
             <div class="category-selector">
-              <label 
-                v-for="category in categories" 
+              <label
+                v-for="category in categories"
                 :key="category"
                 class="category-checkbox"
               >
-                <input 
-                  v-model="settings.preferredCategories" 
-                  type="checkbox" 
+                <input
+                  v-model="settings.preferredCategories"
+                  type="checkbox"
                   :value="category"
                 />
                 <span class="checkbox-label">{{ category }}</span>
@@ -166,15 +145,17 @@
               <p>Maximum distance for event recommendations (miles)</p>
             </div>
             <div class="range-slider">
-              <input 
-                v-model="settings.distanceRange" 
-                type="range" 
-                min="5" 
-                max="50" 
+              <input
+                v-model="settings.distanceRange"
+                type="range"
+                min="5"
+                max="50"
                 step="5"
                 class="slider"
               />
-              <span class="range-value">{{ settings.distanceRange }} miles</span>
+              <span class="range-value"
+                >{{ settings.distanceRange }} miles</span
+              >
             </div>
           </div>
         </div>
@@ -215,16 +196,26 @@ export default {
   setup() {
     const authStore = useAuthStore()
     const saveMessage = ref('')
-    
+
     const user = computed(() => authStore.user)
-    
+
     const userInitials = computed(() => {
       if (!user.value?.name) return 'U'
-      return user.value.name.split(' ').map(n => n[0]).join('').toUpperCase()
+      return user.value.name
+        .split(' ')
+        .map(n => n[0])
+        .join('')
+        .toUpperCase()
     })
 
     const categories = [
-      'Technology', 'Arts', 'Food', 'Music', 'Business', 'Sports', 'Education'
+      'Technology',
+      'Arts',
+      'Food',
+      'Music',
+      'Business',
+      'Sports',
+      'Education'
     ]
 
     const settings = reactive({
@@ -272,16 +263,16 @@ export default {
         settings: settings,
         timestamp: new Date().toISOString()
       }
-      
+
       const dataStr = JSON.stringify(userData, null, 2)
       const dataBlob = new Blob([dataStr], { type: 'application/json' })
       const url = URL.createObjectURL(dataBlob)
-      
+
       const link = document.createElement('a')
       link.href = url
       link.download = 'eventmap-user-data.json'
       link.click()
-      
+
       URL.revokeObjectURL(url)
     }
 
@@ -440,7 +431,7 @@ export default {
 
 .toggle-slider:before {
   position: absolute;
-  content: "";
+  content: '';
   height: 18px;
   width: 18px;
   left: 3px;
@@ -538,19 +529,19 @@ input:checked + .toggle-slider:before {
     align-items: flex-start;
     gap: 1rem;
   }
-  
+
   .action-buttons {
     flex-direction: column;
   }
-  
+
   .profile-info {
     flex-direction: column;
     text-align: center;
   }
-  
+
   .range-slider {
     flex-direction: column;
     align-items: stretch;
   }
 }
-</style> 
+</style>

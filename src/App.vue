@@ -3,9 +3,7 @@
     <nav class="navbar">
       <div class="container">
         <div class="navbar-content">
-          <router-link to="/" class="navbar-brand">
-            EventMap
-          </router-link>
+          <router-link to="/" class="navbar-brand"> EventMap </router-link>
           <ul class="navbar-nav">
             <li>
               <router-link to="/" class="nav-link" active-class="active">
@@ -13,17 +11,29 @@
               </router-link>
             </li>
             <li v-if="isAuthenticated">
-              <router-link to="/settings" class="nav-link" active-class="active">
+              <router-link
+                to="/settings"
+                class="nav-link"
+                active-class="active"
+              >
                 Settings
               </router-link>
             </li>
             <li v-if="isAdmin">
-              <router-link to="/create-event" class="nav-link" active-class="active">
+              <router-link
+                to="/create-event"
+                class="nav-link"
+                active-class="active"
+              >
                 Create Event
               </router-link>
             </li>
             <li v-if="isAdmin">
-              <router-link to="/dashboard" class="nav-link" active-class="active">
+              <router-link
+                to="/dashboard"
+                class="nav-link"
+                active-class="active"
+              >
                 Dashboard
               </router-link>
             </li>
@@ -33,15 +43,13 @@
               </router-link>
             </li>
             <li v-else>
-              <button @click="logout" class="btn btn-outline">
-                Logout
-              </button>
+              <button @click="logout" class="btn btn-outline">Logout</button>
             </li>
           </ul>
         </div>
       </div>
     </nav>
-    
+
     <main class="container">
       <router-view />
     </main>
@@ -56,14 +64,14 @@ export default {
   name: 'App',
   setup() {
     const authStore = useAuthStore()
-    
+
     const isAuthenticated = computed(() => authStore.isAuthenticated)
     const isAdmin = computed(() => authStore.isAdmin)
-    
+
     const logout = () => {
       authStore.logout()
     }
-    
+
     return {
       isAuthenticated,
       isAdmin,
@@ -71,4 +79,4 @@ export default {
     }
   }
 }
-</script> 
+</script>

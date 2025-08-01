@@ -25,7 +25,7 @@
                 <div class="meta-value">{{ formatDate(event.date) }}</div>
               </div>
             </div>
-            
+
             <div class="meta-item">
               <div class="meta-icon">🕒</div>
               <div class="meta-content">
@@ -33,7 +33,7 @@
                 <div class="meta-value">{{ event.time }}</div>
               </div>
             </div>
-            
+
             <div class="meta-item">
               <div class="meta-icon">📍</div>
               <div class="meta-content">
@@ -41,12 +41,14 @@
                 <div class="meta-value">{{ event.location.name }}</div>
               </div>
             </div>
-            
+
             <div class="meta-item">
               <div class="meta-icon">👥</div>
               <div class="meta-content">
                 <div class="meta-label">Attendees</div>
-                <div class="meta-value">{{ event.attendees }}/{{ event.maxAttendees }}</div>
+                <div class="meta-value">
+                  {{ event.attendees }}/{{ event.maxAttendees }}
+                </div>
               </div>
             </div>
           </div>
@@ -60,21 +62,33 @@
           <div class="rsvp-section">
             <h3>Are you attending?</h3>
             <div class="rsvp-buttons">
-              <button 
-                @click="rsvp('attending')" 
-                :class="['btn', 'rsvp-btn', { 'active': userRSVP === 'attending' }]"
+              <button
+                @click="rsvp('attending')"
+                :class="[
+                  'btn',
+                  'rsvp-btn',
+                  { active: userRSVP === 'attending' }
+                ]"
               >
                 ✅ I'm attending
               </button>
-              <button 
-                @click="rsvp('interested')" 
-                :class="['btn', 'rsvp-btn', { 'active': userRSVP === 'interested' }]"
+              <button
+                @click="rsvp('interested')"
+                :class="[
+                  'btn',
+                  'rsvp-btn',
+                  { active: userRSVP === 'interested' }
+                ]"
               >
                 🤔 I'm interested
               </button>
-              <button 
-                @click="rsvp('not-attending')" 
-                :class="['btn', 'rsvp-btn', { 'active': userRSVP === 'not-attending' }]"
+              <button
+                @click="rsvp('not-attending')"
+                :class="[
+                  'btn',
+                  'rsvp-btn',
+                  { active: userRSVP === 'not-attending' }
+                ]"
               >
                 ❌ Not attending
               </button>
@@ -89,9 +103,9 @@
         <div class="map-section">
           <h3>Event Location</h3>
           <div class="map-container">
-            <EventMap 
-              :events="[event]" 
-              :center="event.location" 
+            <EventMap
+              :events="[event]"
+              :center="event.location"
               :zoom="15"
               :show-controls="false"
             />
@@ -103,16 +117,14 @@
     <div v-else class="not-found">
       <h2>Event not found</h2>
       <p>The event you're looking for doesn't exist or has been removed.</p>
-      <router-link to="/" class="btn btn-primary">
-        Back to Map
-      </router-link>
+      <router-link to="/" class="btn btn-primary"> Back to Map </router-link>
     </div>
   </div>
 </template>
 
 <script>
 import { ref, computed, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
+
 import { useEventsStore } from '../stores/events'
 import { format } from 'date-fns'
 import EventMap from '../components/EventMap.vue'
@@ -129,40 +141,40 @@ export default {
     }
   },
   setup(props) {
-    const route = useRoute()
     const eventsStore = useEventsStore()
-    
+
     const rsvpMessage = ref('')
-    
+
     const event = computed(() => {
       const eventId = parseInt(props.id)
       return eventsStore.getEventById(eventId)
     })
-    
+
     const userRSVP = computed(() => {
       return eventsStore.getUserRSVP(parseInt(props.id))
     })
 
-    const formatDate = (dateString) => {
+    const formatDate = dateString => {
       return format(new Date(dateString), 'EEEE, MMMM dd, yyyy')
     }
 
-    const rsvp = (status) => {
+    const rsvp = status => {
       eventsStore.rsvpToEvent(parseInt(props.id), status)
-      
+
       // Show confirmation message
       switch (status) {
         case 'attending':
-          rsvpMessage.value = 'Great! You\'re attending this event.'
+          rsvpMessage.value = "Great! You're attending this event."
           break
         case 'interested':
-          rsvpMessage.value = 'Thanks for your interest! We\'ll keep you updated.'
+          rsvpMessage.value =
+            "Thanks for your interest! We'll keep you updated."
           break
         case 'not-attending':
           rsvpMessage.value = 'No problem! Thanks for letting us know.'
           break
       }
-      
+
       // Clear message after 3 seconds
       setTimeout(() => {
         rsvpMessage.value = ''
@@ -368,25 +380,25 @@ export default {
     flex-direction: column;
     gap: 1rem;
   }
-  
+
   .event-title-section h1 {
     font-size: 2rem;
   }
-  
+
   .event-content {
     grid-template-columns: 1fr;
   }
-  
+
   .event-meta-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .rsvp-buttons {
     flex-direction: column;
   }
-  
+
   .rsvp-btn {
     min-width: auto;
   }
 }
-</style> 
+</style>

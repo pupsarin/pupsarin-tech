@@ -59,4 +59,4 @@ export const useAuthStore = defineStore('auth', () => {
     signup,
     logout
   }
-}) 
+})

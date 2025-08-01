@@ -12,19 +12,19 @@
         <div class="stats-number">{{ stats.total }}</div>
         <div class="stats-label">Total Events</div>
       </div>
-      
+
       <div class="stats-card">
         <div class="stats-icon">📅</div>
         <div class="stats-number">{{ stats.upcoming }}</div>
         <div class="stats-label">Upcoming Events</div>
       </div>
-      
+
       <div class="stats-card">
         <div class="stats-icon">👥</div>
         <div class="stats-number">{{ stats.totalAttendees }}</div>
         <div class="stats-label">Total Attendees</div>
       </div>
-      
+
       <div class="stats-card">
         <div class="stats-icon">📈</div>
         <div class="stats-number">{{ stats.past }}</div>
@@ -67,51 +67,57 @@
           <div class="table-cell">Attendees</div>
           <div class="table-cell">Actions</div>
         </div>
-        
-        <div 
-          v-for="event in filteredEvents" 
-          :key="event.id" 
-          class="table-row"
-        >
+
+        <div v-for="event in filteredEvents" :key="event.id" class="table-row">
           <div class="table-cell">
             <div class="event-info">
               <h4>{{ event.title }}</h4>
               <span class="event-category">{{ event.category }}</span>
             </div>
           </div>
-          
+
           <div class="table-cell">
             <div class="date-time">
               <div>{{ formatDate(event.date) }}</div>
               <div class="time">{{ event.time }}</div>
             </div>
           </div>
-          
+
           <div class="table-cell">
             <div class="location">{{ event.location.name }}</div>
           </div>
-          
+
           <div class="table-cell">
             <div class="attendees">
-              <span class="attendee-count">{{ event.attendees }}/{{ event.maxAttendees }}</span>
+              <span class="attendee-count"
+                >{{ event.attendees }}/{{ event.maxAttendees }}</span
+              >
               <div class="progress-bar">
-                <div 
-                  class="progress-fill" 
-                  :style="{ width: `${(event.attendees / event.maxAttendees) * 100}%` }"
+                <div
+                  class="progress-fill"
+                  :style="{
+                    width: `${(event.attendees / event.maxAttendees) * 100}%`
+                  }"
                 ></div>
               </div>
             </div>
           </div>
-          
+
           <div class="table-cell">
             <div class="action-buttons">
-              <router-link :to="`/event/${event.id}`" class="btn btn-outline btn-sm">
+              <router-link
+                :to="`/event/${event.id}`"
+                class="btn btn-outline btn-sm"
+              >
                 👁️ View
               </router-link>
               <button @click="editEvent(event)" class="btn btn-outline btn-sm">
                 ✏️ Edit
               </button>
-              <button @click="deleteEvent(event.id)" class="btn btn-outline btn-sm btn-danger">
+              <button
+                @click="deleteEvent(event.id)"
+                class="btn btn-outline btn-sm btn-danger"
+              >
                 🗑️ Delete
               </button>
             </div>
@@ -133,12 +139,8 @@
           <div class="table-cell">Role</div>
           <div class="table-cell">Actions</div>
         </div>
-        
-        <div 
-          v-for="user in mockUsers" 
-          :key="user.id" 
-          class="table-row"
-        >
+
+        <div v-for="user in mockUsers" :key="user.id" class="table-row">
           <div class="table-cell">
             <div class="user-info">
               <div class="user-avatar">{{ user.name.charAt(0) }}</div>
@@ -148,21 +150,27 @@
               </div>
             </div>
           </div>
-          
+
           <div class="table-cell">
             <div class="email">{{ user.email }}</div>
           </div>
-          
+
           <div class="table-cell">
             <span :class="['role-badge', user.role]">{{ user.role }}</span>
           </div>
-          
+
           <div class="table-cell">
             <div class="action-buttons">
-              <button @click="changeUserRole(user)" class="btn btn-outline btn-sm">
+              <button
+                @click="changeUserRole(user)"
+                class="btn btn-outline btn-sm"
+              >
                 🔄 Change Role
               </button>
-              <button @click="toggleUserStatus(user)" class="btn btn-outline btn-sm">
+              <button
+                @click="toggleUserStatus(user)"
+                class="btn btn-outline btn-sm"
+              >
                 {{ user.status === 'active' ? '🚫 Deactivate' : '✅ Activate' }}
               </button>
             </div>
@@ -178,15 +186,17 @@
       </div>
 
       <div class="activity-list">
-        <div 
-          v-for="activity in recentActivity" 
-          :key="activity.id" 
+        <div
+          v-for="activity in recentActivity"
+          :key="activity.id"
           class="activity-item"
         >
           <div class="activity-icon">{{ activity.icon }}</div>
           <div class="activity-content">
             <div class="activity-text">{{ activity.text }}</div>
-            <div class="activity-time">{{ formatTime(activity.timestamp) }}</div>
+            <div class="activity-time">
+              {{ formatTime(activity.timestamp) }}
+            </div>
           </div>
         </div>
       </div>
@@ -195,7 +205,7 @@
 </template>
 
 <script>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed } from 'vue'
 import { useEventsStore } from '../stores/events'
 import { format, formatDistanceToNow } from 'date-fns'
 
@@ -204,12 +214,12 @@ export default {
   setup() {
     const eventsStore = useEventsStore()
     const eventFilter = ref('all')
-    
+
     const stats = computed(() => eventsStore.getEventStats())
-    
+
     const filteredEvents = computed(() => {
       let events = eventsStore.events
-      
+
       switch (eventFilter.value) {
         case 'upcoming':
           events = eventsStore.getUpcomingEvents()
@@ -217,15 +227,18 @@ export default {
         case 'past':
           events = eventsStore.getPastEvents()
           break
-        case 'today':
+        case 'today': {
           const today = new Date()
           events = events.filter(event => {
             const eventDate = new Date(event.date)
-            return format(eventDate, 'yyyy-MM-dd') === format(today, 'yyyy-MM-dd')
+            return (
+              format(eventDate, 'yyyy-MM-dd') === format(today, 'yyyy-MM-dd')
+            )
           })
           break
+        }
       }
-      
+
       return events
     })
 
@@ -282,32 +295,32 @@ export default {
       }
     ])
 
-    const formatDate = (dateString) => {
+    const formatDate = dateString => {
       return format(new Date(dateString), 'MMM dd, yyyy')
     }
 
-    const formatTime = (timestamp) => {
+    const formatTime = timestamp => {
       return formatDistanceToNow(timestamp, { addSuffix: true })
     }
 
-    const editEvent = (event) => {
+    const editEvent = event => {
       // In a real app, you'd navigate to an edit form
       console.log('Edit event:', event)
       alert(`Edit event: ${event.title}`)
     }
 
-    const deleteEvent = (eventId) => {
+    const deleteEvent = eventId => {
       if (confirm('Are you sure you want to delete this event?')) {
         eventsStore.deleteEvent(eventId)
       }
     }
 
-    const changeUserRole = (user) => {
+    const changeUserRole = user => {
       const newRole = user.role === 'admin' ? 'user' : 'admin'
       user.role = newRole
     }
 
-    const toggleUserStatus = (user) => {
+    const toggleUserStatus = user => {
       user.status = user.status === 'active' ? 'inactive' : 'active'
     }
 
@@ -316,12 +329,12 @@ export default {
       const dataStr = JSON.stringify(eventsData, null, 2)
       const dataBlob = new Blob([dataStr], { type: 'application/json' })
       const url = URL.createObjectURL(dataBlob)
-      
+
       const link = document.createElement('a')
       link.href = url
       link.download = 'events-export.json'
       link.click()
-      
+
       URL.revokeObjectURL(url)
     }
 
@@ -637,29 +650,29 @@ export default {
   .stats-overview {
     grid-template-columns: repeat(2, 1fr);
   }
-  
+
   .quick-actions {
     flex-direction: column;
   }
-  
+
   .table-header,
   .table-row {
     grid-template-columns: 1fr;
     gap: 0.5rem;
   }
-  
+
   .table-cell {
     justify-content: flex-start;
   }
-  
+
   .action-buttons {
     justify-content: flex-start;
   }
-  
+
   .section-header {
     flex-direction: column;
     gap: 1rem;
     align-items: stretch;
   }
 }
-</style> 
+</style>

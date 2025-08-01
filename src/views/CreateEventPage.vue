@@ -10,10 +10,10 @@
         <div class="form-row">
           <div class="form-group">
             <label class="form-label">Event Title *</label>
-            <input 
-              v-model="form.title" 
-              type="text" 
-              class="form-input" 
+            <input
+              v-model="form.title"
+              type="text"
+              class="form-input"
               placeholder="Enter event title"
               required
             />
@@ -37,9 +37,9 @@
 
         <div class="form-group">
           <label class="form-label">Description *</label>
-          <textarea 
-            v-model="form.description" 
-            class="form-input" 
+          <textarea
+            v-model="form.description"
+            class="form-input"
             rows="4"
             placeholder="Describe your event..."
             required
@@ -49,20 +49,20 @@
         <div class="form-row">
           <div class="form-group">
             <label class="form-label">Date *</label>
-            <input 
-              v-model="form.date" 
-              type="date" 
-              class="form-input" 
+            <input
+              v-model="form.date"
+              type="date"
+              class="form-input"
               required
             />
           </div>
 
           <div class="form-group">
             <label class="form-label">Time *</label>
-            <input 
-              v-model="form.time" 
-              type="time" 
-              class="form-input" 
+            <input
+              v-model="form.time"
+              type="time"
+              class="form-input"
               required
             />
           </div>
@@ -71,10 +71,10 @@
         <div class="form-row">
           <div class="form-group">
             <label class="form-label">Location Name *</label>
-            <input 
-              v-model="form.locationName" 
-              type="text" 
-              class="form-input" 
+            <input
+              v-model="form.locationName"
+              type="text"
+              class="form-input"
               placeholder="Enter location name"
               required
             />
@@ -82,10 +82,10 @@
 
           <div class="form-group">
             <label class="form-label">Max Attendees</label>
-            <input 
-              v-model="form.maxAttendees" 
-              type="number" 
-              class="form-input" 
+            <input
+              v-model="form.maxAttendees"
+              type="number"
+              class="form-input"
               placeholder="100"
               min="1"
             />
@@ -95,17 +95,17 @@
         <div class="form-group">
           <label class="form-label">Location Coordinates</label>
           <div class="coordinates-input">
-            <input 
-              v-model="form.lat" 
-              type="number" 
-              class="form-input" 
+            <input
+              v-model="form.lat"
+              type="number"
+              class="form-input"
               placeholder="Latitude (e.g., 40.7128)"
               step="0.0001"
             />
-            <input 
-              v-model="form.lng" 
-              type="number" 
-              class="form-input" 
+            <input
+              v-model="form.lng"
+              type="number"
+              class="form-input"
               placeholder="Longitude (e.g., -74.0060)"
               step="0.0001"
             />
@@ -114,8 +114,8 @@
         </div>
 
         <!-- Map for location picker -->
-        <LocationPicker 
-          :initial-location="{ lat: 40.7128, lng: -74.0060 }"
+        <LocationPicker
+          :initial-location="{ lat: 40.7128, lng: -74.006 }"
           @location-selected="handleLocationSelected"
           @location-cleared="handleLocationCleared"
         />
@@ -128,9 +128,7 @@
           <button type="button" @click="resetForm" class="btn btn-outline">
             Reset Form
           </button>
-          <button type="submit" class="btn btn-primary">
-            Create Event
-          </button>
+          <button type="submit" class="btn btn-primary">Create Event</button>
         </div>
       </form>
     </div>
@@ -138,7 +136,7 @@
 </template>
 
 <script>
-import { reactive, ref, onMounted } from 'vue'
+import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useEventsStore } from '../stores/events'
 import LocationPicker from '../components/LocationPicker.vue'
@@ -151,9 +149,9 @@ export default {
   setup() {
     const router = useRouter()
     const eventsStore = useEventsStore()
-    
+
     const error = ref('')
-    
+
     const form = reactive({
       title: '',
       description: '',
@@ -168,10 +166,17 @@ export default {
 
     const handleSubmit = async () => {
       error.value = ''
-      
+
       try {
         // Validate required fields
-        if (!form.title || !form.description || !form.date || !form.time || !form.category || !form.locationName) {
+        if (
+          !form.title ||
+          !form.description ||
+          !form.date ||
+          !form.time ||
+          !form.category ||
+          !form.locationName
+        ) {
           error.value = 'Please fill in all required fields'
           return
         }
@@ -197,7 +202,7 @@ export default {
         }
 
         const newEvent = eventsStore.addEvent(eventData)
-        
+
         // Redirect to the new event details page
         router.push(`/event/${newEvent.id}`)
       } catch (err) {
@@ -205,10 +210,12 @@ export default {
       }
     }
 
-    const handleLocationSelected = (location) => {
+    const handleLocationSelected = location => {
       form.lat = location.lat.toString()
       form.lng = location.lng.toString()
-      form.locationName = location.address || `Location at ${location.lat.toFixed(6)}, ${location.lng.toFixed(6)}`
+      form.locationName =
+        location.address ||
+        `Location at ${location.lat.toFixed(6)}, ${location.lng.toFixed(6)}`
     }
 
     const handleLocationCleared = () => {
@@ -317,17 +324,17 @@ export default {
   .form-row {
     grid-template-columns: 1fr;
   }
-  
+
   .coordinates-input {
     grid-template-columns: 1fr;
   }
-  
+
   .form-actions {
     flex-direction: column;
   }
-  
+
   .event-form {
     padding: 1.5rem;
   }
 }
-</style> 
+</style>

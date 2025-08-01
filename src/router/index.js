@@ -54,7 +54,7 @@ const router = createRouter({
 // Navigation guards
 router.beforeEach((to, from, next) => {
   const authStore = useAuthStore()
-  
+
   if (to.meta.requiresAuth && !authStore.isAuthenticated) {
     next('/auth')
   } else if (to.meta.requiresAdmin && !authStore.isAdmin) {
@@ -64,4 +64,4 @@ router.beforeEach((to, from, next) => {
   }
 })
 
-export default router 
+export default router
