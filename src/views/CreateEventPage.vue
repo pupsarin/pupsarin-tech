@@ -30,6 +30,7 @@
               <option value="Business">Business</option>
               <option value="Sports">Sports</option>
               <option value="Education">Education</option>
+              <option value="Entertainment">Entertainment</option>
             </select>
           </div>
         </div>
@@ -113,34 +114,11 @@
         </div>
 
         <!-- Map for location picker -->
-        <div class="map-container">
-          <div id="location-map" style="height: 300px; width: 100%; border-radius: 0.5rem; overflow: hidden;">
-            <div style="
-              height: 100%; 
-              width: 100%; 
-              background: linear-gradient(45deg, #f0f0f0 25%, transparent 25%), 
-                          linear-gradient(-45deg, #f0f0f0 25%, transparent 25%), 
-                          linear-gradient(45deg, transparent 75%, #f0f0f0 75%), 
-                          linear-gradient(-45deg, transparent 75%, #f0f0f0 75%);
-              background-size: 20px 20px;
-              background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              color: #666;
-              font-size: 1rem;
-              cursor: crosshair;
-            ">
-              <div style="text-align: center;">
-                <div style="font-size: 2rem; margin-bottom: 0.5rem;">📍</div>
-                <div>Click to set event location</div>
-                <div style="font-size: 0.8rem; margin-top: 0.5rem;">
-                  Current: {{ form.lat || 'Not set' }}, {{ form.lng || 'Not set' }}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <LocationPicker 
+          :initial-location="{ lat: 40.7128, lng: -74.0060 }"
+          @location-selected="handleLocationSelected"
+          @location-cleared="handleLocationCleared"
+        />
 
         <div v-if="error" class="error-message">
           {{ error }}
@@ -163,9 +141,13 @@
 import { reactive, ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useEventsStore } from '../stores/events'
+import LocationPicker from '../components/LocationPicker.vue'
 
 export default {
   name: 'CreateEventPage',
+  components: {
+    LocationPicker
+  },
   setup() {
     const router = useRouter()
     const eventsStore = useEventsStore()
@@ -223,6 +205,18 @@ export default {
       }
     }
 
+    const handleLocationSelected = (location) => {
+      form.lat = location.lat.toString()
+      form.lng = location.lng.toString()
+      form.locationName = location.address || `Location at ${location.lat.toFixed(6)}, ${location.lng.toFixed(6)}`
+    }
+
+    const handleLocationCleared = () => {
+      form.lat = ''
+      form.lng = ''
+      form.locationName = ''
+    }
+
     const resetForm = () => {
       Object.assign(form, {
         title: '',
@@ -238,46 +232,13 @@ export default {
       error.value = ''
     }
 
-    const initMap = () => {
-      const mapContainer = document.getElementById('location-map')
-      if (mapContainer) {
-        const mapDiv = mapContainer.querySelector('div')
-        mapDiv.addEventListener('click', (e) => {
-          const rect = mapDiv.getBoundingClientRect()
-          const x = e.clientX - rect.left
-          const y = e.clientY - rect.top
-          
-          // Mock coordinates based on click position
-          // In a real app, you'd convert pixel coordinates to lat/lng
-          const lat = 40.7128 + (y / rect.height - 0.5) * 0.1
-          const lng = -74.0060 + (x / rect.width - 0.5) * 0.1
-          
-          form.lat = lat.toFixed(4)
-          form.lng = lng.toFixed(4)
-          
-          // Update the map display
-          mapDiv.innerHTML = `
-            <div style="text-align: center;">
-              <div style="font-size: 2rem; margin-bottom: 0.5rem;">📍</div>
-              <div>Location set!</div>
-              <div style="font-size: 0.8rem; margin-top: 0.5rem;">
-                ${form.lat}, ${form.lng}
-              </div>
-            </div>
-          `
-        })
-      }
-    }
-
-    onMounted(() => {
-      initMap()
-    })
-
     return {
       form,
       error,
       handleSubmit,
-      resetForm
+      resetForm,
+      handleLocationSelected,
+      handleLocationCleared
     }
   }
 }

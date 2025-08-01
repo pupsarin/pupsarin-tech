@@ -89,31 +89,12 @@
         <div class="map-section">
           <h3>Event Location</h3>
           <div class="map-container">
-            <div id="event-map" style="height: 300px; width: 100%; border-radius: 0.5rem; overflow: hidden;">
-              <div style="
-                height: 100%; 
-                width: 100%; 
-                background: linear-gradient(45deg, #f0f0f0 25%, transparent 25%), 
-                            linear-gradient(-45deg, #f0f0f0 25%, transparent 25%), 
-                            linear-gradient(45deg, transparent 75%, #f0f0f0 75%), 
-                            linear-gradient(-45deg, transparent 75%, #f0f0f0 75%);
-                background-size: 20px 20px;
-                background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                color: #666;
-                font-size: 1rem;
-              ">
-                <div style="text-align: center;">
-                  <div style="font-size: 2rem; margin-bottom: 0.5rem;">📍</div>
-                  <div>{{ event.location.name }}</div>
-                  <div style="font-size: 0.8rem; margin-top: 0.5rem;">
-                    {{ event.location.lat }}, {{ event.location.lng }}
-                  </div>
-                </div>
-              </div>
-            </div>
+            <EventMap 
+              :events="[event]" 
+              :center="event.location" 
+              :zoom="15"
+              :show-controls="false"
+            />
           </div>
         </div>
       </div>
@@ -134,9 +115,13 @@ import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useEventsStore } from '../stores/events'
 import { format } from 'date-fns'
+import EventMap from '../components/EventMap.vue'
 
 export default {
   name: 'EventDetailsPage',
+  components: {
+    EventMap
+  },
   props: {
     id: {
       type: [String, Number],

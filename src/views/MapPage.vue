@@ -5,23 +5,11 @@
       <p>Discover and explore events happening around you</p>
     </div>
 
-    <!-- Filter Bar -->
+    <!-- Category Filter -->
     <div class="filter-bar">
       <div class="filter-row">
         <div class="form-group">
-          <label class="form-label">Date Range</label>
-          <select v-model="selectedDateRange" class="form-input">
-            <option value="all">All Events</option>
-            <option value="past-week">Past Week</option>
-            <option value="past-two-weeks">Past Two Weeks</option>
-            <option value="upcoming">Upcoming Events</option>
-            <option value="next-week">Next Week</option>
-            <option value="next-month">Next Month</option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">Category</label>
+          <label class="form-label">Filter by Category</label>
           <select v-model="selectedCategory" class="form-input">
             <option value="">All Categories</option>
             <option value="Technology">Technology</option>
@@ -29,28 +17,38 @@
             <option value="Food">Food</option>
             <option value="Music">Music</option>
             <option value="Business">Business</option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">Layer</label>
-          <select v-model="selectedLayer" class="form-input">
-            <option value="all">All Events</option>
-            <option value="past">Past Events</option>
-            <option value="upcoming">Upcoming Events</option>
-            <option value="today">Today's Events</option>
+            <option value="Sports">Sports</option>
+            <option value="Education">Education</option>
+            <option value="Entertainment">Entertainment</option>
           </select>
         </div>
 
         <button @click="clearFilters" class="btn btn-outline">
-          Clear Filters
+          Clear Filter
         </button>
       </div>
     </div>
 
-    <!-- Map Container -->
+    <!-- Map Container with Time Navigator Overlay -->
     <div class="map-container">
-      <div id="map" style="height: 100%; width: 100%;"></div>
+      <EventMap 
+        :events="filteredEvents" 
+        :center="{ lat: 40.7128, lng: -74.0060 }" 
+        :zoom="12"
+        :current-week="currentWeek"
+        @event-click="handleEventClick"
+      />
+      
+      <!-- Compact Time Navigator Overlay -->
+      <div class="time-navigator-overlay">
+        <TimeNavigator 
+          :events="eventsStore.events"
+          :initial-week-index="currentWeekIndex"
+          :compact="true"
+          @week-change="handleWeekChange"
+          @event-click="handleEventClick"
+        />
+      </div>
     </div>
 
     <!-- Events List -->
@@ -87,79 +85,45 @@
 
 <script>
 import { ref, computed, onMounted, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import { useEventsStore } from '../stores/events'
-import { format, subDays, addDays, startOfDay, endOfDay } from 'date-fns'
+import { format, subDays, addDays, startOfDay, endOfDay, startOfWeek, endOfWeek, isWithinInterval, parseISO } from 'date-fns'
+import EventMap from '../components/EventMap.vue'
+import TimeNavigator from '../components/TimeNavigator.vue'
 
 export default {
   name: 'MapPage',
+  components: {
+    EventMap,
+    TimeNavigator
+  },
   setup() {
+    const router = useRouter()
     const eventsStore = useEventsStore()
     
-    const selectedDateRange = ref('all')
     const selectedCategory = ref('')
-    const selectedLayer = ref('all')
+    const currentWeekIndex = ref(0)
+    const currentWeek = ref(null)
     const map = ref(null)
     const markers = ref([])
 
     const filteredEvents = computed(() => {
       let events = eventsStore.events
 
-      // Filter by date range
-      if (selectedDateRange.value !== 'all') {
-        const today = new Date()
-        switch (selectedDateRange.value) {
-          case 'past-week':
-            events = events.filter(event => {
-              const eventDate = new Date(event.date)
-              return eventDate >= subDays(today, 7) && eventDate < today
-            })
-            break
-          case 'past-two-weeks':
-            events = events.filter(event => {
-              const eventDate = new Date(event.date)
-              return eventDate >= subDays(today, 14) && eventDate < today
-            })
-            break
-          case 'upcoming':
-            events = events.filter(event => new Date(event.date) >= today)
-            break
-          case 'next-week':
-            events = events.filter(event => {
-              const eventDate = new Date(event.date)
-              return eventDate >= today && eventDate <= addDays(today, 7)
-            })
-            break
-          case 'next-month':
-            events = events.filter(event => {
-              const eventDate = new Date(event.date)
-              return eventDate >= today && eventDate <= addDays(today, 30)
-            })
-            break
-        }
+      // Filter by current week from TimeNavigator
+      if (currentWeek.value) {
+        events = events.filter(event => {
+          const eventDate = parseISO(event.date)
+          return isWithinInterval(eventDate, {
+            start: currentWeek.value.start,
+            end: currentWeek.value.end
+          })
+        })
       }
 
       // Filter by category
       if (selectedCategory.value) {
         events = events.filter(event => event.category === selectedCategory.value)
-      }
-
-      // Filter by layer
-      if (selectedLayer.value !== 'all') {
-        const today = new Date()
-        switch (selectedLayer.value) {
-          case 'past':
-            events = events.filter(event => new Date(event.date) < today)
-            break
-          case 'upcoming':
-            events = events.filter(event => new Date(event.date) >= today)
-            break
-          case 'today':
-            events = events.filter(event => {
-              const eventDate = new Date(event.date)
-              return eventDate >= startOfDay(today) && eventDate <= endOfDay(today)
-            })
-            break
-        }
       }
 
       return events
@@ -169,10 +133,19 @@ export default {
       return format(new Date(dateString), 'MMM dd, yyyy')
     }
 
+    const handleWeekChange = (weekData) => {
+      currentWeekIndex.value = weekData.weekIndex
+      currentWeek.value = weekData.week
+    }
+
+    const handleEventClick = (event) => {
+      router.push(`/event/${event.id}`)
+    }
+
     const clearFilters = () => {
-      selectedDateRange.value = 'all'
       selectedCategory.value = ''
-      selectedLayer.value = 'all'
+      currentWeek.value = null
+      currentWeekIndex.value = 0
     }
 
     const selectEvent = (event) => {
@@ -182,71 +155,19 @@ export default {
       }
     }
 
-    const initMap = () => {
-      // Mock map initialization (in real app, you'd use Leaflet or similar)
-      const mapContainer = document.getElementById('map')
-      if (mapContainer) {
-        mapContainer.innerHTML = `
-          <div style="
-            height: 100%; 
-            width: 100%; 
-            background: linear-gradient(45deg, #f0f0f0 25%, transparent 25%), 
-                        linear-gradient(-45deg, #f0f0f0 25%, transparent 25%), 
-                        linear-gradient(45deg, transparent 75%, #f0f0f0 75%), 
-                        linear-gradient(-45deg, transparent 75%, #f0f0f0 75%);
-            background-size: 20px 20px;
-            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #666;
-            font-size: 1.2rem;
-          ">
-            <div style="text-align: center;">
-              <div style="font-size: 3rem; margin-bottom: 1rem;">🗺️</div>
-              <div>Interactive Map View</div>
-              <div style="font-size: 0.9rem; margin-top: 0.5rem;">
-                {{ filteredEvents.length }} events displayed
-              </div>
-            </div>
-          </div>
-        `
-      }
-    }
-
-    const updateMapMarkers = () => {
-      // Clear existing markers
-      markers.value = []
-      
-      // Add new markers for filtered events
-      filteredEvents.value.forEach(event => {
-        markers.value.push({
-          id: event.id,
-          lat: event.location.lat,
-          lng: event.location.lng,
-          title: event.title
-        })
-      })
-    }
-
-    onMounted(() => {
-      initMap()
-      updateMapMarkers()
-    })
-
-    watch(filteredEvents, () => {
-      updateMapMarkers()
-      initMap()
-    })
+    // Remove old map initialization code since we're using the EventMap component
 
     return {
-      selectedDateRange,
+      eventsStore,
       selectedCategory,
-      selectedLayer,
+      currentWeekIndex,
+      currentWeek,
       filteredEvents,
       formatDate,
       clearFilters,
-      selectEvent
+      selectEvent,
+      handleEventClick,
+      handleWeekChange
     }
   }
 }
@@ -254,41 +175,76 @@ export default {
 
 <style scoped>
 .map-page {
-  padding: 2rem 0;
+  padding: 1rem 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
 .page-header {
   text-align: center;
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
+  flex-shrink: 0;
 }
 
 .page-header h1 {
-  font-size: 2.5rem;
+  font-size: 2rem;
   font-weight: 700;
   color: var(--text-primary);
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.25rem;
 }
 
 .page-header p {
   color: var(--text-secondary);
-  font-size: 1.1rem;
+  font-size: 1rem;
+}
+
+.filter-bar {
+  margin-bottom: 1rem;
+  flex-shrink: 0;
+}
+
+.map-container {
+  position: relative;
+  flex: 1;
+  height: 70vh;
+  min-height: 500px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+  display: block;
+}
+
+.time-navigator-overlay {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  right: 20px;
+  z-index: 1000;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 8px;
+  padding: 1rem;
+  box-shadow: var(--shadow-lg);
+  max-width: 400px;
 }
 
 .events-section {
-  margin-top: 2rem;
+  margin-top: 1rem;
+  flex-shrink: 0;
 }
 
 .events-section h2 {
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   font-weight: 600;
-  margin-bottom: 1rem;
+  margin-bottom: 0.75rem;
   color: var(--text-primary);
 }
 
 .events-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1rem;
 }
 
 .event-header {
@@ -320,12 +276,28 @@ export default {
 }
 
 @media (max-width: 768px) {
-  .events-grid {
-    grid-template-columns: 1fr;
+  .map-page {
+    padding: 0.5rem;
   }
   
   .page-header h1 {
-    font-size: 2rem;
+    font-size: 1.5rem;
+  }
+  
+  .map-container {
+    height: 60vh;
+    min-height: 400px;
+  }
+  
+  .time-navigator-overlay {
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    padding: 0.75rem;
+  }
+  
+  .events-grid {
+    grid-template-columns: 1fr;
   }
 }
 </style> 

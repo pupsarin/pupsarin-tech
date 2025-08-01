@@ -5,10 +5,14 @@ A modern, responsive event management web application built with Vue.js 3, featu
 ## Features
 
 ### 🗺️ Map Page
-- **Interactive Map View**: Display events on a map with filtering capabilities
-- **Event Filtering**: Filter events by date range (past week, upcoming, etc.)
-- **Layer Scrolling**: Switch between past, upcoming, and today's events
-- **Category Filtering**: Filter events by category (Technology, Arts, Food, etc.)
+- **Real Interactive Map**: Powered by Leaflet with OpenStreetMap tiles
+- **Multiple Map Layers**: Streets, Satellite, and Terrain views
+- **Time Navigation**: Week-by-week navigation with range slider (25 events across 10 weeks)
+- **Event Layer Management**: Toggle visibility of upcoming, past, and today's events
+- **Smart Event Markers**: Color-coded markers based on event status (today=red, upcoming=green, past=grey)
+- **Interactive Popups**: Click markers for event details and quick navigation
+- **Week Preview**: See all events for the selected week with day-by-day breakdown
+- **Advanced Filtering**: Filter events by category and layer type
 
 ### 👤 User Authentication
 - **Login/Signup**: Secure authentication system with role-based access
@@ -30,7 +34,9 @@ A modern, responsive event management web application built with Vue.js 3, featu
 - **Attendee Tracking**: Real-time attendee count and capacity
 
 ### 🎯 Admin Features
-- **Event Creation**: Create new events with location picker
+- **Event Creation**: Create new events with real map location picker
+- **Location Search**: Search for locations and get real addresses
+- **Interactive Location Picker**: Click and drag to set precise event locations
 - **Event Management**: View, edit, and delete events
 - **User Management**: Manage user roles and account status
 - **Dashboard Analytics**: Event statistics and recent activity
@@ -103,12 +109,21 @@ src/
 
 The application uses mock data for demonstration purposes:
 
-### Events
-- Tech Meetup 2024
-- Art Gallery Opening
-- Food Festival
-- Music Concert
-- Startup Pitch Night
+### Events (25 Total)
+**Past Events (Dec 2023):**
+- Holiday Market, Winter Jazz Festival, Tech Year in Review
+
+**Current & Future Events (Jan-Mar 2024):**
+- New Year's Day Run, Art Exhibition Opening, Business Networking Mixer
+- Cooking Workshop, Poetry Slam, Tech Meetup 2024, Yoga in the Park
+- Art Gallery Opening, Food Festival, Classical Music Concert
+- Startup Pitch Night, Music Concert, Book Reading & Discussion
+- Photography Workshop, Comedy Night, Valentine's Day Dance
+- AI & Machine Learning Summit, Fashion Week Show
+- Marathon Training Session, Wine Tasting Event
+- Spring Art Walk, Tech Career Fair
+
+**Spread across 10 weeks with events Monday-Sunday**
 
 ### Users
 - Admin User (admin@example.com)
@@ -117,9 +132,15 @@ The application uses mock data for demonstration purposes:
 ## Features in Detail
 
 ### Map Functionality
-- Mock map implementation with interactive location picking
-- Event filtering by date, category, and layer
-- Responsive design for mobile and desktop
+- **Real Map Integration**: Leaflet.js with OpenStreetMap tiles
+- **Multiple Base Layers**: Streets, Satellite, and Terrain views
+- **Time Navigation System**: Week-by-week navigation with interactive range slider
+- **Event Layer Management**: Separate layers for upcoming, past, and today's events
+- **Smart Markers**: Color-coded markers with interactive popups
+- **Week Preview**: Detailed view of events for each selected week
+- **Location Search**: Geocoding using Nominatim API
+- **Interactive Location Picker**: Click and drag functionality for event creation
+- **Responsive Design**: Works seamlessly on mobile and desktop
 
 ### Authentication System
 - Role-based access control
