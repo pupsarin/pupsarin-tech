@@ -60,7 +60,6 @@ jobs:
     
     environment:
       name: uat
-      url: ${{ steps.deployment.outputs.page_url }}
     
     steps:
       - name: Checkout code
@@ -94,36 +93,15 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           
-      - name: Create deployment status
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const deployment = await github.rest.repos.createDeployment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              ref: context.sha,
-              environment: 'uat',
-              description: 'UAT deployment to GitHub Pages',
-              auto_merge: false,
-              required_contexts: []
-            });
-            
-            await github.rest.repos.createDeploymentStatus({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              deployment_id: deployment.data.id,
-              state: 'success',
-              environment_url: '${{ steps.deployment.outputs.page_url }}',
-              description: 'Successfully deployed to GitHub Pages'
-            });
+
             
       - name: Notify deployment success
         if: success()
         run: |
           echo "✅ UAT deployment successful!"
-          echo "🌐 Live URL: ${{ steps.deployment.outputs.page_url }}"
           echo "📦 Build: ${{ github.sha }}"
           echo "🏷️ Tag: uat-${{ github.run_number }}"
+          echo "🌐 Check GitHub Pages for the live URL"
           
       - name: Notify deployment failure
         if: failure()
