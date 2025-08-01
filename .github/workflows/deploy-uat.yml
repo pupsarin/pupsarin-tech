@@ -14,31 +14,31 @@ env:
 jobs:
   test:
     runs-on: ubuntu-latest
-
+    
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
+        
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-
+          
       - name: Install dependencies
         run: npm ci
-
+        
       - name: Run linting
         run: npm run lint || echo "Linting completed with warnings"
         continue-on-error: true
-
+        
       - name: Run tests (if available)
         run: npm run test || echo "No tests configured"
         continue-on-error: true
-
+        
       - name: Build application
         run: npm run build
-
+        
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -49,30 +49,37 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     needs: test
-
+    
     # Only deploy on push to uat branch, not on pull requests
     if: github.ref == 'refs/heads/uat'
-
+    
     environment:
       name: uat
       url: ${{ steps.deployment.outputs.page_url }}
-
+    
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
+        with:
+          fetch-depth: 0
+        
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-
+          
       - name: Install dependencies
         run: npm ci
-
+        
       - name: Build application
         run: npm run build
-
+        
+      - name: Setup Git
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+        
       - name: Deploy to GitHub Pages
         id: deployment
         uses: peaceiris/actions-gh-pages@v3
@@ -85,7 +92,9 @@ jobs:
           user_email: 'github-actions[bot]@users.noreply.github.com'
           commit_message: 'Deploy UAT build - ${{ github.sha }}'
           tag_name: 'uat-${{ github.run_number }}'
-
+          enable_jekyll: false
+          cname: ''
+          
       - name: Create deployment status
         uses: actions/github-script@v7
         with:
@@ -99,7 +108,7 @@ jobs:
               auto_merge: false,
               required_contexts: []
             });
-
+            
             await github.rest.repos.createDeploymentStatus({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -108,7 +117,7 @@ jobs:
               environment_url: '${{ steps.deployment.outputs.page_url }}',
               description: 'Successfully deployed to GitHub Pages'
             });
-
+            
       - name: Notify deployment success
         if: success()
         run: |
@@ -116,10 +125,10 @@ jobs:
           echo "🌐 Live URL: ${{ steps.deployment.outputs.page_url }}"
           echo "📦 Build: ${{ github.sha }}"
           echo "🏷️ Tag: uat-${{ github.run_number }}"
-
+          
       - name: Notify deployment failure
         if: failure()
         run: |
           echo "❌ UAT deployment failed!"
           echo "🔍 Check the logs above for details"
-          echo "📦 Build: ${{ github.sha }}"
+          echo "📦 Build: ${{ github.sha }}" 
