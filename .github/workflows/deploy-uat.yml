@@ -53,6 +53,11 @@ jobs:
     # Only deploy on push to uat branch, not on pull requests
     if: github.ref == 'refs/heads/uat'
     
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+    
     environment:
       name: uat
       url: ${{ steps.deployment.outputs.page_url }}
@@ -75,25 +80,19 @@ jobs:
       - name: Build application
         run: npm run build
         
-      - name: Setup Git
-        run: |
-          git config --global user.name 'github-actions[bot]'
-          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
         
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './dist'
+          
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: peaceiris/actions-gh-pages@v3
+        uses: actions/deploy-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist
-          publish_branch: gh-pages
-          force_orphan: true
-          user_name: 'github-actions[bot]'
-          user_email: 'github-actions[bot]@users.noreply.github.com'
-          commit_message: 'Deploy UAT build - ${{ github.sha }}'
-          tag_name: 'uat-${{ github.run_number }}'
-          enable_jekyll: false
-          cname: ''
           
       - name: Create deployment status
         uses: actions/github-script@v7
